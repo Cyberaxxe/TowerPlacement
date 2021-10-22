@@ -1,0 +1,8 @@
+game.ReplicatedStorage.TowerPlaced.OnServerEvent:Connect(function(player, towerVal, currPos, Cost, Cash)
+		
+	local ServerSidedTower = towerVal.Value:Clone()
+	ServerSidedTower.HumanoidRootPart.CFrame = CFrame.new(currPos) * CFrame.new(0,3,-0.2)
+	ServerSidedTower.Parent = workspace
+	
+end)
+
