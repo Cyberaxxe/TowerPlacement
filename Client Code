@@ -1,0 +1,52 @@
+local player = game.Players.LocalPlayer
+local Character = player.Character
+local HRP = player.Character:WaitForChild("HumanoidRootPart")
+
+local Mouse = player:GetMouse()
+
+local x = script.Parent.Cash
+local Cash = x.Value
+x.Value = 1000
+
+local renderingPath
+local placingPath
+
+local canPlace = false
+local isPlacing = false
+
+local rendering = game:GetService("RunService")
+local Towers_ = script.Parent.InventoryBar:GetChildren()
+
+
+for _, towerPicked in pairs(Towers_) do
+	towerPicked.MouseButton1Click:Connect(function()
+		local towerVal = towerPicked.TowerValue
+		local newTower = towerVal.Value:Clone()
+		newTower.Parent = workspace
+		Mouse.TargetFilter = newTower
+		canPlace = true
+		
+		local Cost = towerPicked.Cost.Value
+		
+		renderingPath = rendering.RenderStepped:Connect(function()
+			newTower.LeftFoot.CFrame = CFrame.new(Mouse.Hit.X, Mouse.Hit.Y, Mouse.Hit.Z)
+		end)
+		
+		placingPath = game:GetService("UserInputService").InputBegan:Connect(function(input, gameStuff)
+			if not gameStuff then
+				if input.UserInputType == Enum.UserInputType.MouseButton1 and canPlace == true then
+					
+					local currPos = newTower.LeftFoot.Position
+					Cash -= Cost
+					
+					placingPath:Disconnect()
+					renderingPath:Disconnect()
+					newTower:Destroy()
+					
+					game.ReplicatedStorage.TowerPlaced:FireServer(towerVal, currPos, Cash, Cost)
+					
+				end
+			end
+		end)
+	end)
+end
